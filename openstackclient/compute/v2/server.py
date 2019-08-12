@@ -30,6 +30,7 @@ from osc_lib import exceptions
 from osc_lib import utils
 from oslo_utils import timeutils
 import six
+from osprofiler import profiler
 
 from openstackclient.i18n import _
 from openstackclient.identity import common as identity_common
@@ -201,6 +202,7 @@ def _prep_server_detail(compute_client, image_client, server, refresh=True):
     return info
 
 
+@profiler.trace_cls("openstackclient")
 class AddFixedIP(command.Command):
     _description = _("Add fixed IP address to server")
 
@@ -240,6 +242,7 @@ class AddFixedIP(command.Command):
         )
 
 
+@profiler.trace_cls("openstackclient")
 class AddFloatingIP(network_common.NetworkAndComputeCommand):
     _description = _("Add floating IP address to server")
 
@@ -326,6 +329,7 @@ class AddFloatingIP(network_common.NetworkAndComputeCommand):
         )
 
 
+@profiler.trace_cls("openstackclient")
 class AddPort(command.Command):
     _description = _("Add port to server")
 
@@ -359,6 +363,7 @@ class AddPort(command.Command):
         server.interface_attach(port_id=port_id, net_id=None, fixed_ip=None)
 
 
+@profiler.trace_cls("openstackclient")
 class AddNetwork(command.Command):
     _description = _("Add network to server")
 
@@ -392,6 +397,7 @@ class AddNetwork(command.Command):
         server.interface_attach(port_id=None, net_id=net_id, fixed_ip=None)
 
 
+@profiler.trace_cls("openstackclient")
 class AddServerSecurityGroup(command.Command):
     _description = _("Add security group to server")
 
@@ -423,6 +429,7 @@ class AddServerSecurityGroup(command.Command):
         server.add_security_group(security_group['id'])
 
 
+@profiler.trace_cls("openstackclient")
 class AddServerVolume(command.Command):
     _description = _("Add volume to server")
 
@@ -465,6 +472,7 @@ class AddServerVolume(command.Command):
         )
 
 
+@profiler.trace_cls("openstackclient")
 class CreateServer(command.ShowOne):
     _description = _("Create a new server")
 
@@ -940,6 +948,7 @@ class CreateServer(command.ShowOne):
         return zip(*sorted(six.iteritems(details)))
 
 
+@profiler.trace_cls("openstackclient")
 class CreateServerDump(command.Command):
     """Create a dump file in server(s)
 
@@ -968,6 +977,7 @@ class CreateServerDump(command.Command):
             ).trigger_crash_dump()
 
 
+@profiler.trace_cls("openstackclient")
 class DeleteServer(command.Command):
     _description = _("Delete server(s)")
 
@@ -1008,6 +1018,7 @@ class DeleteServer(command.Command):
                     raise SystemExit
 
 
+@profiler.trace_cls("openstackclient")
 class ListServer(command.Lister):
     _description = _("List servers")
 
@@ -1359,6 +1370,7 @@ class ListServer(command.Lister):
         return table
 
 
+@profiler.trace_cls("openstackclient")
 class LockServer(command.Command):
 
     _description = _("Lock server(s). A non-admin user will not be able to "
@@ -1394,6 +1406,7 @@ class LockServer(command.Command):
 # live_parser = parser.add_argument_group(title='Live migration options')
 # then adding the groups doesn't seem to work
 
+@profiler.trace_cls("openstackclient")
 class MigrateServer(command.Command):
     _description = _("Migrate server to different host")
 
@@ -1488,6 +1501,7 @@ class MigrateServer(command.Command):
                 raise SystemExit
 
 
+@profiler.trace_cls("openstackclient")
 class PauseServer(command.Command):
     _description = _("Pause server(s)")
 
@@ -1510,6 +1524,7 @@ class PauseServer(command.Command):
             ).pause()
 
 
+@profiler.trace_cls("openstackclient")
 class RebootServer(command.Command):
     _description = _("Perform a hard or soft server reboot")
 
@@ -1570,6 +1585,7 @@ class RebootServer(command.Command):
                 raise SystemExit
 
 
+@profiler.trace_cls("openstackclient")
 class RebuildServer(command.ShowOne):
     _description = _("Rebuild server")
 
@@ -1672,6 +1688,7 @@ class RebuildServer(command.ShowOne):
         return zip(*sorted(six.iteritems(details)))
 
 
+@profiler.trace_cls("openstackclient")
 class RemoveFixedIP(command.Command):
     _description = _("Remove fixed IP address from server")
 
@@ -1698,6 +1715,7 @@ class RemoveFixedIP(command.Command):
         server.remove_fixed_ip(parsed_args.ip_address)
 
 
+@profiler.trace_cls("openstackclient")
 class RemoveFloatingIP(network_common.NetworkAndComputeCommand):
     _description = _("Remove floating IP address from server")
 
@@ -1733,6 +1751,7 @@ class RemoveFloatingIP(network_common.NetworkAndComputeCommand):
         )
 
 
+@profiler.trace_cls("openstackclient")
 class RemovePort(command.Command):
     _description = _("Remove port from server")
 
@@ -1766,6 +1785,7 @@ class RemovePort(command.Command):
         server.interface_detach(port_id)
 
 
+@profiler.trace_cls("openstackclient")
 class RemoveNetwork(command.Command):
     _description = _("Remove all ports of a network from server")
 
@@ -1801,6 +1821,7 @@ class RemoveNetwork(command.Command):
                 server.interface_detach(inf.port_id)
 
 
+@profiler.trace_cls("openstackclient")
 class RemoveServerSecurityGroup(command.Command):
     _description = _("Remove security group from server")
 
@@ -1832,6 +1853,7 @@ class RemoveServerSecurityGroup(command.Command):
         server.remove_security_group(security_group['id'])
 
 
+@profiler.trace_cls("openstackclient")
 class RemoveServerVolume(command.Command):
     _description = _("Remove volume from server")
 
@@ -1868,6 +1890,7 @@ class RemoveServerVolume(command.Command):
         )
 
 
+@profiler.trace_cls("openstackclient")
 class RescueServer(command.Command):
     _description = _("Put server in rescue mode")
 
@@ -1909,6 +1932,7 @@ class RescueServer(command.Command):
                  password=parsed_args.password)
 
 
+@profiler.trace_cls("openstackclient")
 class ResizeServer(command.Command):
     _description = _("""Scale server to a new flavor.
 
@@ -1985,6 +2009,7 @@ the new server and restart the old one.""")
             compute_client.servers.revert_resize(server)
 
 
+@profiler.trace_cls("openstackclient")
 class RestoreServer(command.Command):
     _description = _("Restore server(s)")
 
@@ -2007,6 +2032,7 @@ class RestoreServer(command.Command):
             ).restore()
 
 
+@profiler.trace_cls("openstackclient")
 class ResumeServer(command.Command):
     _description = _("Resume server(s)")
 
@@ -2030,6 +2056,7 @@ class ResumeServer(command.Command):
             ).resume()
 
 
+@profiler.trace_cls("openstackclient")
 class SetServer(command.Command):
     _description = _("Set server properties")
 
@@ -2095,6 +2122,7 @@ class SetServer(command.Command):
                 raise exceptions.CommandError(msg)
 
 
+@profiler.trace_cls("openstackclient")
 class ShelveServer(command.Command):
     _description = _("Shelve server(s)")
 
@@ -2117,6 +2145,7 @@ class ShelveServer(command.Command):
             ).shelve()
 
 
+@profiler.trace_cls("openstackclient")
 class ShowServer(command.ShowOne):
     _description = _(
         "Show server details. Specify ``--os-compute-api-version 2.47`` "
@@ -2157,6 +2186,7 @@ class ShowServer(command.ShowOne):
         return zip(*sorted(six.iteritems(data)))
 
 
+@profiler.trace_cls("openstackclient")
 class SshServer(command.Command):
     _description = _("SSH to server")
 
@@ -2301,6 +2331,7 @@ class SshServer(command.Command):
         os.system(cmd % (login, ip_address))
 
 
+@profiler.trace_cls("openstackclient")
 class StartServer(command.Command):
     _description = _("Start server(s).")
 
@@ -2323,6 +2354,7 @@ class StartServer(command.Command):
             ).start()
 
 
+@profiler.trace_cls("openstackclient")
 class StopServer(command.Command):
     _description = _("Stop server(s).")
 
@@ -2345,6 +2377,7 @@ class StopServer(command.Command):
             ).stop()
 
 
+@profiler.trace_cls("openstackclient")
 class SuspendServer(command.Command):
     _description = _("Suspend server(s)")
 
@@ -2368,6 +2401,7 @@ class SuspendServer(command.Command):
             ).suspend()
 
 
+@profiler.trace_cls("openstackclient")
 class UnlockServer(command.Command):
     _description = _("Unlock server(s)")
 
@@ -2391,6 +2425,7 @@ class UnlockServer(command.Command):
             ).unlock()
 
 
+@profiler.trace_cls("openstackclient")
 class UnpauseServer(command.Command):
     _description = _("Unpause server(s)")
 
@@ -2414,6 +2449,7 @@ class UnpauseServer(command.Command):
             ).unpause()
 
 
+@profiler.trace_cls("openstackclient")
 class UnrescueServer(command.Command):
     _description = _("Restore server from rescue mode")
 
@@ -2435,6 +2471,7 @@ class UnrescueServer(command.Command):
         ).unrescue()
 
 
+@profiler.trace_cls("openstackclient")
 class UnsetServer(command.Command):
     _description = _("Unset server properties")
 
@@ -2469,6 +2506,7 @@ class UnsetServer(command.Command):
             )
 
 
+@profiler.trace_cls("openstackclient")
 class UnshelveServer(command.Command):
     _description = _("Unshelve server(s)")
 
