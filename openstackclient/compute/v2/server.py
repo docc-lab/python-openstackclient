@@ -228,6 +228,7 @@ class AddFixedIP(command.Command):
         return parser
 
     def take_action(self, parsed_args):
+        profiler.set_request_type("FixedIPAdd")
         compute_client = self.app.client_manager.compute
 
         server = utils.find_resource(
@@ -270,6 +271,7 @@ class AddFloatingIP(network_common.NetworkAndComputeCommand):
         return parser
 
     def take_action_network(self, client, parsed_args):
+        profiler.set_request_type("FloatingIPAdd")
         compute_client = self.app.client_manager.compute
 
         attrs = {}
@@ -322,6 +324,7 @@ class AddFloatingIP(network_common.NetworkAndComputeCommand):
                 raise error
 
     def take_action_compute(self, client, parsed_args):
+        profiler.set_request_type("FloatingIPAdd")
         client.api.floating_ip_add(
             parsed_args.server,
             parsed_args.ip_address,
@@ -348,6 +351,7 @@ class AddPort(command.Command):
         return parser
 
     def take_action(self, parsed_args):
+        profiler.set_request_type("PortAdd")
         compute_client = self.app.client_manager.compute
 
         server = utils.find_resource(
@@ -382,6 +386,7 @@ class AddNetwork(command.Command):
         return parser
 
     def take_action(self, parsed_args):
+        profiler.set_request_type("NetworkAdd")
         compute_client = self.app.client_manager.compute
 
         server = utils.find_resource(
@@ -416,6 +421,7 @@ class AddServerSecurityGroup(command.Command):
         return parser
 
     def take_action(self, parsed_args):
+        profiler.set_request_type("ServerSecurityGroupAdd")
         compute_client = self.app.client_manager.compute
 
         server = utils.find_resource(
@@ -453,6 +459,7 @@ class AddServerVolume(command.Command):
         return parser
 
     def take_action(self, parsed_args):
+        profiler.set_request_type("ServerVolumeAdd")
         compute_client = self.app.client_manager.compute
         volume_client = self.app.client_manager.volume
 
@@ -970,6 +977,7 @@ class CreateServerDump(command.Command):
         return parser
 
     def take_action(self, parsed_args):
+        profiler.set_request_type("ServerDumpCreate")
         compute_client = self.app.client_manager.compute
         for server in parsed_args.server:
             utils.find_resource(
@@ -1390,6 +1398,7 @@ class LockServer(command.Command):
         return parser
 
     def take_action(self, parsed_args):
+        profiler.set_request_type("ServerLock")
 
         compute_client = self.app.client_manager.compute
         for server in parsed_args.server:
@@ -1462,6 +1471,7 @@ class MigrateServer(command.Command):
         return parser
 
     def take_action(self, parsed_args):
+        profiler.set_request_type("ServerMigrate")
 
         def _show_progress(progress):
             if progress:
@@ -1519,6 +1529,7 @@ class PauseServer(command.Command):
         return parser
 
     def take_action(self, parsed_args):
+        profiler.set_request_type("ServerPause")
         compute_client = self.app.client_manager.compute
         for server in parsed_args.server:
             utils.find_resource(
@@ -1563,6 +1574,7 @@ class RebootServer(command.Command):
         return parser
 
     def take_action(self, parsed_args):
+        profiler.set_request_type("ServerReboot")
 
         def _show_progress(progress):
             if progress:
@@ -1641,6 +1653,7 @@ class RebuildServer(command.ShowOne):
         return parser
 
     def take_action(self, parsed_args):
+        profiler.set_request_type("ServerRebuild")
 
         def _show_progress(progress):
             if progress:
@@ -1710,6 +1723,7 @@ class RemoveFixedIP(command.Command):
         return parser
 
     def take_action(self, parsed_args):
+        profiler.set_request_type("FixedIPRemove")
         compute_client = self.app.client_manager.compute
 
         server = utils.find_resource(
@@ -1738,6 +1752,7 @@ class RemoveFloatingIP(network_common.NetworkAndComputeCommand):
         return parser
 
     def take_action_network(self, client, parsed_args):
+        profiler.set_request_type("FloatingIPRemove")
         attrs = {}
         obj = client.find_ip(
             parsed_args.ip_address,
@@ -1748,6 +1763,7 @@ class RemoveFloatingIP(network_common.NetworkAndComputeCommand):
         client.update_ip(obj, **attrs)
 
     def take_action_compute(self, client, parsed_args):
+        profiler.set_request_type("FloatingIPRemove")
         client.api.floating_ip_remove(
             parsed_args.server,
             parsed_args.ip_address,
@@ -1773,6 +1789,7 @@ class RemovePort(command.Command):
         return parser
 
     def take_action(self, parsed_args):
+        profiler.set_request_type("PortRemove")
         compute_client = self.app.client_manager.compute
 
         server = utils.find_resource(
@@ -1807,6 +1824,7 @@ class RemoveNetwork(command.Command):
         return parser
 
     def take_action(self, parsed_args):
+        profiler.set_request_type("NetworkRemove")
         compute_client = self.app.client_manager.compute
 
         server = utils.find_resource(
@@ -1843,6 +1861,7 @@ class RemoveServerSecurityGroup(command.Command):
         return parser
 
     def take_action(self, parsed_args):
+        profiler.set_request_type("ServerSecurityGroupRemove")
         compute_client = self.app.client_manager.compute
 
         server = utils.find_resource(
@@ -1875,6 +1894,7 @@ class RemoveServerVolume(command.Command):
         return parser
 
     def take_action(self, parsed_args):
+        profiler.set_request_type("ServerVolumeRemove")
         compute_client = self.app.client_manager.compute
         volume_client = self.app.client_manager.volume
 
@@ -1918,6 +1938,7 @@ class RescueServer(command.Command):
         return parser
 
     def take_action(self, parsed_args):
+        profiler.set_request_type("ServerRescue")
         compute_client = self.app.client_manager.compute
         image_client = self.app.client_manager.image
 
@@ -1976,6 +1997,7 @@ the new server and restart the old one.""")
         return parser
 
     def take_action(self, parsed_args):
+        profiler.set_request_type("ServerResize")
 
         def _show_progress(progress):
             if progress:
@@ -2027,6 +2049,7 @@ class RestoreServer(command.Command):
         return parser
 
     def take_action(self, parsed_args):
+        profiler.set_request_type("ServerRestore")
         compute_client = self.app.client_manager.compute
         for server in parsed_args.server:
             utils.find_resource(
@@ -2050,6 +2073,7 @@ class ResumeServer(command.Command):
         return parser
 
     def take_action(self, parsed_args):
+        profiler.set_request_type("ServerResume")
 
         compute_client = self.app.client_manager.compute
         for server in parsed_args.server:
@@ -2096,6 +2120,7 @@ class SetServer(command.Command):
         return parser
 
     def take_action(self, parsed_args):
+        profiler.set_request_type("ServerSet")
 
         compute_client = self.app.client_manager.compute
         server = utils.find_resource(
@@ -2140,6 +2165,7 @@ class ShelveServer(command.Command):
         return parser
 
     def take_action(self, parsed_args):
+        profiler.set_request_type("ServerShelve")
         compute_client = self.app.client_manager.compute
         for server in parsed_args.server:
             utils.find_resource(
@@ -2170,6 +2196,7 @@ class ShowServer(command.ShowOne):
         return parser
 
     def take_action(self, parsed_args):
+        profiler.set_request_type("ServerShow")
         compute_client = self.app.client_manager.compute
         server = utils.find_resource(compute_client.servers,
                                      parsed_args.server)
@@ -2295,6 +2322,7 @@ class SshServer(command.Command):
         return parser
 
     def take_action(self, parsed_args):
+        profiler.set_request_type("ServerSsh")
 
         compute_client = self.app.client_manager.compute
         server = utils.find_resource(
@@ -2349,6 +2377,7 @@ class StartServer(command.Command):
         return parser
 
     def take_action(self, parsed_args):
+        profiler.set_request_type("ServerStart")
         compute_client = self.app.client_manager.compute
         for server in parsed_args.server:
             utils.find_resource(
@@ -2372,6 +2401,7 @@ class StopServer(command.Command):
         return parser
 
     def take_action(self, parsed_args):
+        profiler.set_request_type("ServerStop")
         compute_client = self.app.client_manager.compute
         for server in parsed_args.server:
             utils.find_resource(
@@ -2395,6 +2425,7 @@ class SuspendServer(command.Command):
         return parser
 
     def take_action(self, parsed_args):
+        profiler.set_request_type("ServerSuspend")
 
         compute_client = self.app.client_manager.compute
         for server in parsed_args.server:
@@ -2419,6 +2450,7 @@ class UnlockServer(command.Command):
         return parser
 
     def take_action(self, parsed_args):
+        profiler.set_request_type("ServerUnlock")
 
         compute_client = self.app.client_manager.compute
         for server in parsed_args.server:
@@ -2443,6 +2475,7 @@ class UnpauseServer(command.Command):
         return parser
 
     def take_action(self, parsed_args):
+        profiler.set_request_type("ServerUnpause")
 
         compute_client = self.app.client_manager.compute
         for server in parsed_args.server:
@@ -2466,6 +2499,7 @@ class UnrescueServer(command.Command):
         return parser
 
     def take_action(self, parsed_args):
+        profiler.set_request_type("ServerUnrescue")
 
         compute_client = self.app.client_manager.compute
         utils.find_resource(
@@ -2496,6 +2530,7 @@ class UnsetServer(command.Command):
         return parser
 
     def take_action(self, parsed_args):
+        profiler.set_request_type("ServerUnset")
         compute_client = self.app.client_manager.compute
         server = utils.find_resource(
             compute_client.servers,
@@ -2524,6 +2559,7 @@ class UnshelveServer(command.Command):
         return parser
 
     def take_action(self, parsed_args):
+        profiler.set_request_type("ServerUnshelve")
         compute_client = self.app.client_manager.compute
         for server in parsed_args.server:
             utils.find_resource(
