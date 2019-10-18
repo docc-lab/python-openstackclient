@@ -653,6 +653,7 @@ class CreateServer(command.ShowOne):
         return parser
 
     def take_action(self, parsed_args):
+        profiler.request_type("ServerCreate")
 
         def _show_progress(progress):
             if progress:
@@ -997,6 +998,7 @@ class DeleteServer(command.Command):
         return parser
 
     def take_action(self, parsed_args):
+        profiler.request_type("ServerDelete")
 
         def _show_progress(progress):
             if progress:
@@ -1148,6 +1150,7 @@ class ListServer(command.Lister):
         return parser
 
     def take_action(self, parsed_args):
+        profiler.request_type("ServerList")
         compute_client = self.app.client_manager.compute
         identity_client = self.app.client_manager.identity
         image_client = self.app.client_manager.image
