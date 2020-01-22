@@ -37,7 +37,10 @@ class DeleteService(command.Command):
             "service",
             metavar="<service>",
             nargs='+',
-            help=_("Compute service(s) to delete (ID only)")
+            help=_("Compute service(s) to delete (ID only). If using "
+                   "``--os-compute-api-version`` 2.53 or greater, the ID is "
+                   "a UUID which can be retrieved by listing compute services "
+                   "using the same 2.53+ microversion.")
         )
         return parser
 
@@ -60,7 +63,11 @@ class DeleteService(command.Command):
 
 
 class ListService(command.Lister):
-    _description = _("List compute services")
+    _description = _("List compute services. Using "
+                     "``--os-compute-api-version`` 2.53 or greater will "
+                     "return the ID as a UUID value which can be used to "
+                     "uniquely identify the service in a multi-cell "
+                     "deployment.")
 
     def get_parser(self, prog_name):
         parser = super(ListService, self).get_parser(prog_name)
@@ -159,6 +166,33 @@ class SetService(command.Command):
         )
         return parser
 
+    @staticmethod
+    def _find_service_by_host_and_binary(cs, host, binary):
+        """Utility method to find a compute service by host and binary
+
+        :param host: the name of the compute service host
+        :param binary: the compute service binary, e.g. nova-compute
+        :returns: novaclient.v2.services.Service dict-like object
+        :raises: CommandError if no or multiple results were found
+        """
+        services = cs.list(host=host, binary=binary)
+        # Did we find anything?
+        if not len(services):
+            msg = _('Compute service for host "%(host)s" and binary '
+                    '"%(binary)s" not found.') % {
+                        'host': host, 'binary': binary}
+            raise exceptions.CommandError(msg)
+        # Did we find more than one result? This should not happen but let's
+        # be safe.
+        if len(services) > 1:
+            # TODO(mriedem): If we have an --id option for 2.53+ then we can
+            # say to use that option to uniquely identify the service.
+            msg = _('Multiple compute services found for host "%(host)s" and '
+                    'binary "%(binary)s". Unable to proceed.') % {
+                        'host': host, 'binary': binary}
+            raise exceptions.CommandError(msg)
+        return services[0]
+
     def take_action(self, parsed_args):
         compute_client = self.app.client_manager.compute
         cs = compute_client.services
@@ -168,6 +202,20 @@ class SetService(command.Command):
             msg = _("Cannot specify option --disable-reason without "
                     "--disable specified.")
             raise exceptions.CommandError(msg)
+
+        # Starting with microversion 2.53, there is a single
+        # PUT /os-services/{service_id} API for updating nova-compute
+        # services. If 2.53+ is used we need to find the nova-compute
+        # service using the --host and --service (binary) values.
+        requires_service_id = (
+            compute_client.api_version >= api_versions.APIVersion('2.53'))
+        service_id = None
+        if requires_service_id:
+            # TODO(mriedem): Add an --id option so users can pass the service
+            # id (as a uuid) directly rather than make us look it up using
+            # host/binary.
+            service_id = SetService._find_service_by_host_and_binary(
+                cs, parsed_args.host, parsed_args.service).id
 
         result = 0
         enabled = None
@@ -179,14 +227,21 @@ class SetService(command.Command):
 
             if enabled is not None:
                 if enabled:
-                    cs.enable(parsed_args.host, parsed_args.service)
+                    args = (service_id,) if requires_service_id else (
+                        parsed_args.host, parsed_args.service)
+                    cs.enable(*args)
                 else:
                     if parsed_args.disable_reason:
-                        cs.disable_log_reason(parsed_args.host,
-                                              parsed_args.service,
-                                              parsed_args.disable_reason)
+                        args = (service_id, parsed_args.disable_reason) if \
+                            requires_service_id else (
+                            parsed_args.host,
+                            parsed_args.service,
+                            parsed_args.disable_reason)
+                        cs.disable_log_reason(*args)
                     else:
-                        cs.disable(parsed_args.host, parsed_args.service)
+                        args = (service_id,) if requires_service_id else (
+                            parsed_args.host, parsed_args.service)
+                        cs.disable(*args)
         except Exception:
             status = "enabled" if enabled else "disabled"
             LOG.error("Failed to set service status to %s", status)
@@ -204,8 +259,9 @@ class SetService(command.Command):
                         'required')
                 raise exceptions.CommandError(msg)
             try:
-                cs.force_down(parsed_args.host, parsed_args.service,
-                              force_down=force_down)
+                args = (service_id, force_down) if requires_service_id else (
+                    parsed_args.host, parsed_args.service, force_down)
+                cs.force_down(*args)
             except Exception:
                 state = "down" if force_down else "up"
                 LOG.error("Failed to set service state to %s", state)
