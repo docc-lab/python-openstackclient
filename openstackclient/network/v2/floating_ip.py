@@ -15,6 +15,7 @@
 
 from osc_lib.command import command
 from osc_lib import utils
+from osprofiler import profiler
 
 from openstackclient.i18n import _
 from openstackclient.identity import common as identity_common
@@ -94,6 +95,7 @@ def _get_attrs(client_manager, parsed_args):
     return attrs
 
 
+@profiler.trace_cls("openstackclient")
 class CreateFloatingIP(common.NetworkAndComputeShowOne):
     _description = _("Create floating IP")
 
@@ -185,6 +187,7 @@ class CreateFloatingIP(common.NetworkAndComputeShowOne):
         return (columns, data)
 
 
+@profiler.trace_cls("openstackclient")
 class DeleteFloatingIP(common.NetworkAndComputeDelete):
     _description = _("Delete floating IP(s)")
 
@@ -212,6 +215,7 @@ class DeleteFloatingIP(common.NetworkAndComputeDelete):
         client.api.floating_ip_delete(self.r)
 
 
+@profiler.trace_cls("openstackclient")
 class ListFloatingIP(common.NetworkAndComputeLister):
     # TODO(songminglong): Use SDK resource mapped attribute names once
     # the OSC minimum requirements include SDK 1.0
@@ -374,6 +378,7 @@ class ListFloatingIP(common.NetworkAndComputeLister):
                 ) for s in data))
 
 
+@profiler.trace_cls("openstackclient")
 class SetFloatingIP(command.Command):
     _description = _("Set floating IP Properties")
 
@@ -439,6 +444,7 @@ class SetFloatingIP(command.Command):
         _tag.update_tags_for_set(client, obj, parsed_args)
 
 
+@profiler.trace_cls("openstackclient")
 class ShowFloatingIP(common.NetworkAndComputeShowOne):
     _description = _("Display floating IP details")
 
@@ -466,6 +472,7 @@ class ShowFloatingIP(common.NetworkAndComputeShowOne):
         return (columns, data)
 
 
+@profiler.trace_cls("openstackclient")
 class UnsetFloatingIP(command.Command):
     _description = _("Unset floating IP Properties")
 
